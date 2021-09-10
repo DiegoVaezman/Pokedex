@@ -3,6 +3,8 @@ import { Dimensions, StyleSheet, Text, View, TouchableOpacity, Image } from 'rea
 import { SimplePokemon } from '../interfaces/pokemonInterfaces';
 import { FadeInImage } from './FadeInImage';
 import { getImageColors } from '../helpers/getColors';
+import { useNavigation } from '@react-navigation/core';
+import { FirstUpercase } from '../helpers/firstUpercase';
 
 const windowWidth = Dimensions.get('window').width
 
@@ -12,16 +14,19 @@ interface Props {
 
 export const PokemonCard = ({pokemon}: Props) => {
 
+    const navigation = useNavigation<any>();  //type any para evitar el error de typscript al usar navigation que pide tipo never
+
     const [bgColor , setBgColor] = useState('grey');
     const isMounted = useRef(true); //para evitar aplicar la funcion de color y demás si el componente (tarjeta) está desmontado porque se ha hecho scroll y ha sido destruido.... si no da errores...
 
 
     const getColors = async () => {
         const color = await getImageColors(pokemon.picture);
-        setBgColor(color || 'grey');
+        if (isMounted.current) setBgColor(color || 'grey');  //la condicion es para evitar cambiar un state después de haber sido desmontado, eso da un warning de memory leak
     }
 
     useEffect(() => {
+        
         getColors();
         
         return () => {  //el return en un useEffect se ejecuta cuando es desmontado el componente. (por ejemplo destruido con un srollview de carga perezosa.)
@@ -32,7 +37,7 @@ export const PokemonCard = ({pokemon}: Props) => {
     return (
         <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => console.log('press')}
+                onPress={() => navigation.navigate('PokemonScreen', {simplePokemon: pokemon, color: bgColor})}
             >
                 <View
                     style={{
@@ -44,7 +49,7 @@ export const PokemonCard = ({pokemon}: Props) => {
                     {/* nombre del pokemon e id */}
                     <View>
                         <Text style={styles.name}>
-                            {pokemon.name}
+                            {FirstUpercase(pokemon.name)}
                             {'\n#' + pokemon.id}
                         </Text>
                     </View>

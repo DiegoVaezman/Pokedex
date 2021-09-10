@@ -1,13 +1,19 @@
 import 'react-native-gesture-handler';
 import React from 'react'
-import { Button, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { StackNavigation } from './src/navigation/StackNavigation';
+import { TabScreen } from './src/navigation/Tabs';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 const App = () => {
   return (
     <NavigationContainer>
-      <StackNavigation />
+      <KeyboardAvoidingView  //hace que le teclado no estorbe la visualicación
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{flex: 1}}
+      >
+        {/* <StackNavigation /> */}
+        <TabScreen />
+      </KeyboardAvoidingView>
     </NavigationContainer>
   )
 }
